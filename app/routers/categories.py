@@ -3,8 +3,10 @@ from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.categories import Category as CategoryModel
+from app.models.users import User as UserModel
 from app.schemas import Category as CategorySchema, CategoryCreate
 from app.db_depends import get_async_db
+from app.auth import get_is_admin
 
 
 # Создаём маршрутизатор с префиксом и тегом
@@ -21,7 +23,8 @@ router = APIRouter(
 )
 async def create_category(
     category: CategoryCreate,
-    db: AsyncSession = Depends(get_async_db)
+    db: AsyncSession = Depends(get_async_db),
+    current_user: UserModel = Depends(get_is_admin)
 ):
     """
     Создаёт новую категорию.
@@ -62,7 +65,8 @@ async def get_all_categories(db: AsyncSession = Depends(get_async_db)):
 @router.delete("/{category_id}", response_model=CategorySchema)
 async def delete_category(
     category_id: int,
-    db: AsyncSession = Depends(get_async_db)
+    db: AsyncSession = Depends(get_async_db),
+    current_user: UserModel = Depends(get_is_admin)
 ):
     """
     Выполняет мягкое удаление категории, устанавливая is_active = False.
@@ -92,7 +96,8 @@ async def delete_category(
 async def update_category(
     category_id: int,
     category: CategoryCreate,
-    db: AsyncSession = Depends(get_async_db)
+    db: AsyncSession = Depends(get_async_db),
+    current_user: UserModel = Depends(get_is_admin)
 ):
     """
     Обновляет категорию по её ID.

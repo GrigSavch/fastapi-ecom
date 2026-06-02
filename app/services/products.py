@@ -10,7 +10,6 @@ from app.services.categories import check_category
 
 async def select_products(
     db: AsyncSession,
-    product_id: int | None = None,
     category_id: int | None = None
 ) -> Sequence[ProductModel] | ProductModel | None:
 
@@ -29,7 +28,7 @@ async def select_products(
 async def select_product_by_id(
     db: AsyncSession,
     product_id: int
-) -> ProductModel | None:
+) -> ProductModel:
 
     stmt = select(ProductModel).where(
         ProductModel.id == product_id,
