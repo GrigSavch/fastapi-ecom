@@ -20,5 +20,6 @@ class User(Base):
     products: Mapped[list["Product"]] = relationship(
         "Product", back_populates="seller"
     )
-    tokens = relationship("RefreshToken", back_populates="user")
-
+    reviews: Mapped[list["ReviewModel"]] = relationship(
+        "ReviewModel", back_populates="author"
+    )

@@ -1,4 +1,3 @@
-import uuid
 from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordBearer
 from datetime import datetime, timedelta, timezone
@@ -8,7 +7,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
 from app.models.users import User as UserModel
-from app.models.tokens import RefreshToken
 from app.config import SECRET_KEY, ALGORITHM
 from app.db_depends import get_async_db
 from pydantic import SecretStr
@@ -65,9 +63,8 @@ def create_access_token(data: dict):
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 
-async def create_refresh_token(
-    data: dict, 
-    db: AsyncSession
+def create_refresh_token(
+    data: dict
 ):
     """
     Создаёт refresh-токен с длительным сроком действия и token_type="refresh".
@@ -76,20 +73,10 @@ async def create_refresh_token(
     expire = datetime.now(timezone.utc) + timedelta(
         days=REFRESH_TOKEN_EXPIRE_DAYS
     )
-    jti = str(uuid.uuid4())
     to_encode.update({
         "exp": expire,
-        "jti": jti,
         "token_type": "refresh",
     })
-
-    token = RefreshToken(
-        user_id=data['id'],
-        jti=jti,
-        expires_at=expire
-    )
-    db.add(token)
-    await db.commit()
 
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
@@ -153,5 +140,19 @@ async def get_is_admin(
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Only admins can perform this action"
+        )
+    return current_user
+
+
+async def get_current_buyer(
+    current_user: UserModel = Depends(get_current_user)
+):
+    """
+    Проверяет, что пользователь имеет роль 'buyer'.
+    """
+    if current_user.role != "buyer":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only buyers can perform this action"
         )
     return current_user

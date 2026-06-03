@@ -1,3 +1,4 @@
+from datetime import datetime
 from pydantic import BaseModel, Field, ConfigDict, EmailStr, SecretStr
 from decimal import Decimal
 
@@ -77,7 +78,9 @@ class Product(BaseModel):
     stock: int = Field(..., description="Количество товара на складе")
     category_id: int = Field(..., description="ID категории")
     is_active: bool = Field(..., description="Активность товара")
-
+    rating: float = Field(..., description="Рейтинг товара")
+    seller_id: int = Field(..., description="ID продавца")
+    
     model_config = ConfigDict(from_attributes=True)
 
 
@@ -99,8 +102,28 @@ class User(BaseModel):
     email: EmailStr
     is_active: bool
     role: str
+
     model_config = ConfigDict(from_attributes=True)
 
 
 class RefreshTokenRequest(BaseModel):
     refresh_token: str
+
+
+class ReviewBase(BaseModel):
+    product_id: int
+    comment: str | None
+    grade: int = Field(..., ge=1, le=5)
+
+
+class ReviewCreate(ReviewBase):
+    pass
+
+
+class ReviewRead(ReviewBase):
+    id: int
+    user_id: int
+    comment_date: datetime
+    is_active: bool
+
+    model_config = ConfigDict(from_attributes=True)

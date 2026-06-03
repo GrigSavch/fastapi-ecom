@@ -194,6 +194,6 @@ async def access_token(
     )
 
     return {
-        "refresh_token": new_access_token,
+        "access_token": new_access_token,
         "token_type": "bearer",
     }
