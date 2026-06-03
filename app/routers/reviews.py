@@ -7,7 +7,7 @@ from app.models.users import User as UserModel
 from app.schemas import ReviewCreate, ReviewRead
 from app.db_depends import get_async_db
 from app.services.products import select_product_by_id, update_product_rating
-from app.auth import get_current_buyer, get_current_user
+from app.auth import get_current_buyer
 from app.routers.products import router as product_router
 
 
@@ -22,6 +22,8 @@ router = APIRouter(
 async def read_all_reviews(
     db: AsyncSession = Depends(get_async_db)
 ):
+    """Возвращает список всех активных отзывов."""
+
     stmt = select(ReviewModel).where(ReviewModel.is_active)
     reviews = (await db.scalars(stmt)).all()
     return reviews
@@ -35,6 +37,8 @@ async def read_review(
     product_id: int,
     db: AsyncSession = Depends(get_async_db),
 ):
+    """Возвращает список всех активных отзывов для конкретного товара."""
+
     await select_product_by_id(db, product_id, stock=False)
 
     stmt = select(ReviewModel).where(
@@ -51,6 +55,8 @@ async def create_review(
     db: AsyncSession = Depends(get_async_db),
     user: UserModel = Depends(get_current_buyer)
 ):
+    """Создаёт новый отзыв для конкретного товара."""
+
     await select_product_by_id(db, review.product_id, stock=False)
 
     new_review = ReviewModel(**review.model_dump(), user_id=user.id)
@@ -66,8 +72,10 @@ async def create_review(
 async def delete_review(
     review_id: int,
     db: AsyncSession = Depends(get_async_db),
-    user: UserModel = Depends(get_current_user)
+    user: UserModel = Depends(get_current_buyer)
 ):
+    """Удаляет отзыв для конкретного товара."""
+
     stmt = (
         select(ReviewModel).where(
             ReviewModel.id == review_id,

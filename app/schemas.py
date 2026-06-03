@@ -98,22 +98,36 @@ class UserCreate(BaseModel):
 
 
 class User(BaseModel):
-    id: int
-    email: EmailStr
-    is_active: bool
-    role: str
+    id: int = Field(..., description="Уникальный идентификатор пользователя")
+    email: EmailStr = Field(..., description="Email пользователя")
+    is_active: bool = Field(..., description="Активность учётной записи")
+    role: str = Field(
+        ...,
+        description="Роль пользователя: 'buyer', 'seller' или 'admin'"
+    )
 
     model_config = ConfigDict(from_attributes=True)
 
 
 class RefreshTokenRequest(BaseModel):
-    refresh_token: str
+    refresh_token: str = Field(
+        ...,
+        description="Refresh-токен для обновления пары access/refresh"
+    )
 
 
 class ReviewBase(BaseModel):
-    product_id: int
-    comment: str | None
-    grade: int = Field(..., ge=1, le=5)
+    product_id: int = Field(..., description="ID товара, к которому относится отзыв")
+    comment: str | None = Field(
+        None,
+        description="Текст отзыва (необязательно)"
+    )
+    grade: int = Field(
+        ...,
+        ge=1,
+        le=5,
+        description="Оценка товара от 1 до 5"
+    )
 
 
 class ReviewCreate(ReviewBase):
@@ -121,9 +135,9 @@ class ReviewCreate(ReviewBase):
 
 
 class ReviewRead(ReviewBase):
-    id: int
-    user_id: int
-    comment_date: datetime
-    is_active: bool
+    id: int = Field(..., description="Уникальный идентификатор отзыва")
+    user_id: int = Field(..., description="ID автора отзыва")
+    comment_date: datetime = Field(..., description="Дата и время публикации отзыва")
+    is_active: bool = Field(..., description="Активность отзыва (виден в каталоге)")
 
     model_config = ConfigDict(from_attributes=True)
