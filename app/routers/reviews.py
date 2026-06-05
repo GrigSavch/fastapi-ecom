@@ -39,7 +39,7 @@ async def read_review(
 ):
     """Возвращает список всех активных отзывов для конкретного товара."""
 
-    await select_product_by_id(db, product_id, stock=False)
+    await select_product_by_id(db, product_id)
 
     stmt = select(ReviewModel).where(
         ReviewModel.product_id == product_id,
@@ -57,7 +57,7 @@ async def create_review(
 ):
     """Создаёт новый отзыв для конкретного товара."""
 
-    await select_product_by_id(db, review.product_id, stock=False)
+    await select_product_by_id(db, review.product_id)
 
     new_review = ReviewModel(**review.model_dump(), user_id=user.id)
 

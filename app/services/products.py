@@ -31,7 +31,7 @@ async def select_products(
 async def select_product_by_id(
     db: AsyncSession,
     product_id: int,
-    stock: bool = True
+    in_stock: bool | None = None
 ) -> ProductModel:
 
     stmt = select(ProductModel).where(
@@ -39,8 +39,10 @@ async def select_product_by_id(
         ProductModel.is_active,
     ).order_by(ProductModel.name)
 
-    if stock:
-        stmt = stmt.where(ProductModel.stock > 0)
+    if in_stock is not None:
+        stmt = stmt.where(
+            ProductModel.stock > 0 if in_stock else ProductModel.stock == 0
+        )
 
     product = (await db.scalars(stmt)).first()
 

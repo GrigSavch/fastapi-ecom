@@ -23,3 +23,9 @@ class User(Base):
     reviews: Mapped[list["ReviewModel"]] = relationship(
         "ReviewModel", back_populates="author"
     )
+    cart_items: Mapped[list["CartItem"]] = relationship(
+        "CartItem", back_populates="user", cascade="all, delete-orphan"
+    )
+    orders: Mapped[list["Order"]] = relationship(
+        "Order", back_populates="user", cascade="all, delete-orphan")
+

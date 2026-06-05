@@ -4,3 +4,4 @@ __pycache__/
 .env
 ecommerce.db
 .mypy_cache
+te.sql
