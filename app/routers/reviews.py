@@ -8,12 +8,17 @@ from app.schemas import ReviewCreate, ReviewRead
 from app.db_depends import get_async_db
 from app.services.products import select_product_by_id, update_product_rating
 from app.auth import get_current_buyer
-from app.routers.products import router as product_router
+# from app.routers.products import router as product_router
 
 
 # Создаём маршрутизатор для товаров
 router = APIRouter(
     prefix="/reviews",
+    tags=["reviews"],
+)
+
+product_router = APIRouter(
+    prefix="/products",
     tags=["reviews"],
 )
 
